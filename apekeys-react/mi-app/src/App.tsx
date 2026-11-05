@@ -1,121 +1,64 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Navigate, Route, Routes } from 'react-router'
+import Layout from './components/Layout'
+import RutaProtegida from './components/RutaProtegida'
+import AdminPanel from './pages/AdminPanel'
+import AdminUsuarios from './pages/AdminUsuarios'
+import Articulo from './pages/Articulo'
+import Carrito from './pages/Carrito'
+import Catalogo from './pages/Catalogo'
+import Categorias from './pages/Categorias'
+import Contacto from './pages/Contacto'
+import Ficha from './pages/Ficha'
+import Inicio from './pages/Inicio'
+import Login from './pages/Login'
+import NoEncontrada from './pages/NoEncontrada'
+import Nosotros from './pages/Nosotros'
+import Noticias from './pages/Noticias'
+import Proximamente from './pages/Proximamente'
+import Registro from './pages/Registro'
 
+// Tabla de rutas de la aplicación: qué página se dibuja para cada URL.
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          <h1>APEKEYS</h1>
-        </button>
-      </section>
+    <Routes>
+      {/* El login no lleva encabezado ni pie, por eso va fuera del Layout */}
+      <Route path="/login" element={<Login />} />
 
-      <div className="ticks"></div>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/catalogo" element={<Catalogo />} />
+        <Route path="/software" element={<Catalogo categoriaFija="Software" />} />
+        <Route path="/categorias" element={<Categorias />} />
+        <Route path="/ficha/:id" element={<Ficha />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/noticias" element={<Noticias />} />
+        <Route path="/noticias/:id" element={<Articulo />} />
+        <Route path="/contacto" element={<Contacto />} />
+        <Route path="/nosotros" element={<Nosotros />} />
+        <Route path="/proximamente/:juego" element={<Proximamente />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Solo con sesión iniciada */}
+        <Route element={<RutaProtegida />}>
+          <Route path="/carrito" element={<Carrito />} />
+        </Route>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Solo administrador y vendedor (el vendedor ve todo en modo consulta) */}
+        <Route element={<RutaProtegida roles={['admin', 'vendedor']} />}>
+          <Route path="/admin" element={<AdminPanel />} />
+        </Route>
+
+        {/* Solo administrador */}
+        <Route element={<RutaProtegida roles={['admin']} />}>
+          <Route path="/admin/usuarios" element={<AdminUsuarios />} />
+        </Route>
+
+        {/* Enlaces de las páginas antiguas */}
+        <Route path="/acceso-tienda" element={<Navigate to="/catalogo" replace />} />
+        <Route path="/inventario" element={<Navigate to="/admin#inventario" replace />} />
+
+        <Route path="*" element={<NoEncontrada />} />
+      </Route>
+    </Routes>
   )
 }
 
